@@ -1,0 +1,12 @@
+{
+    "html.validate.scripts": false,
+    "javascript.validate.enable": false,
+    "[html]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "never"
+        }
+    },
+    "files.associations": {
+        "*.html": "jinja-html"
+    }
+}
