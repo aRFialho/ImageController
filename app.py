@@ -1,6 +1,8 @@
 ﻿import io
 import os
 import sqlite3
+import threading
+import time
 import unicodedata
 from datetime import datetime
 from pathlib import Path
@@ -8,7 +10,7 @@ from uuid import uuid4
 
 import pandas as pd
 from flask import Flask, Response, jsonify, redirect, render_template, request, url_for
-from PIL import Image
+from PIL import Image, ImageOps
 from psycopg import connect
 from psycopg.rows import dict_row
 from werkzeug.utils import secure_filename
@@ -20,8 +22,15 @@ app.config["SQLITE_DB_PATH"] = "gerenciador.db"
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "uploads")
 
 MAX_URLS = 15
-TARGET_MAX_KB = 345
-COMPRESS_TRIGGER_KB = 350
+MAX_UPLOAD_KB = 1024
+MAX_DIMENSION_PX = 2500
+TARGET_UPLOAD_KB = 980
+ALLOWED_IMAGE_FORMATS = {"JPEG", "PNG"}
+VIEW_CACHE_TTL_SECONDS = 25
+VIEW_CACHE_MAX_ITEMS = 240
+
+_view_cache_lock = threading.Lock()
+_view_cache: dict[tuple, tuple[float, dict]] = {}
 
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 USING_POSTGRES = DATABASE_URL.lower().startswith("postgres://") or DATABASE_URL.lower().startswith("postgresql://")
@@ -218,6 +227,7 @@ def init_db() -> None:
         exec_sql(c, "INSERT INTO abas (nome, ordem) VALUES (?, ?)", ("Aba Principal", 0))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
 
 
@@ -235,86 +245,56 @@ def build_image_row(cursor, product_id: int):
     return [{"id": r["id"], "url": r["url"], "ordem": r["ordem"]} for r in rows]
 
 
-def save_image_bytes(file_bytes: bytes, extension: str) -> str:
-    safe_ext = extension.lower().replace(".", "")
-    safe_ext = safe_ext if safe_ext in {"jpg", "jpeg", "png", "webp", "gif"} else "jpg"
-    filename = f"img_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{uuid4().hex}.{safe_ext}"
-    full_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-
-    with open(full_path, "wb") as f:
-        f.write(file_bytes)
-
-    return url_for("static", filename=f"uploads/{filename}")
+def invalidate_view_cache() -> None:
+    with _view_cache_lock:
+        _view_cache.clear()
 
 
-def compress_to_target(file_bytes: bytes, target_kb: int):
-    image = Image.open(io.BytesIO(file_bytes))
-
-    if image.mode not in ("RGB", "RGBA"):
-        image = image.convert("RGB")
-
-    best_bytes = None
-    best_size = 10**12
-
-    def try_encode(img: Image.Image, quality: int):
-        out = io.BytesIO()
-        img.save(out, format="WEBP", quality=quality, method=6)
-        raw = out.getvalue()
-        return raw, len(raw)
-
-    for quality in [90, 84, 78, 72, 66, 60, 54, 48, 42, 36]:
-        encoded, size = try_encode(image, quality)
-        if size < best_size:
-            best_bytes = encoded
-            best_size = size
-        if size <= target_kb * 1024:
-            return encoded, "webp"
-
-    resized = image
-    for _ in range(10):
-        w, h = resized.size
-        if w < 500 or h < 500:
-            break
-        resized = resized.resize((int(w * 0.92), int(h * 0.92)), Image.Resampling.LANCZOS)
-
-        for quality in [76, 68, 60, 52, 44, 36]:
-            encoded, size = try_encode(resized, quality)
-            if size < best_size:
-                best_bytes = encoded
-                best_size = size
-            if size <= target_kb * 1024:
-                return encoded, "webp"
-
-    return best_bytes if best_bytes is not None else file_bytes, "webp"
+def _cache_get(cache_key: tuple):
+    now = time.time()
+    with _view_cache_lock:
+        entry = _view_cache.get(cache_key)
+        if not entry:
+            return None
+        ts, payload = entry
+        if now - ts > VIEW_CACHE_TTL_SECONDS:
+            _view_cache.pop(cache_key, None)
+            return None
+        return payload
 
 
-init_db()
+def _cache_set(cache_key: tuple, payload: dict):
+    with _view_cache_lock:
+        if len(_view_cache) >= VIEW_CACHE_MAX_ITEMS:
+            oldest_key = min(_view_cache, key=lambda k: _view_cache[k][0])
+            _view_cache.pop(oldest_key, None)
+        _view_cache[cache_key] = (time.time(), payload)
 
 
-@app.route("/")
-def index():
+def build_view_payload(aba_param, page_param, per_page_param, search_param, use_cache: bool = True) -> dict:
+    page = max(1, int(page_param or 1))
+    per_page = max(10, min(200, int(per_page_param or 50)))
+    search = str(search_param or "").strip()
+    aba_candidate = int(aba_param) if aba_param else None
+
+    cache_key = (aba_candidate, page, per_page, search.lower())
+    if use_cache:
+        cached = _cache_get(cache_key)
+        if cached is not None:
+            return cached
+
     conn = get_db()
     c = conn.cursor()
 
     abas_rows = fetch_all(c, "SELECT id, nome, ordem FROM abas ORDER BY ordem")
-
     if not abas_rows:
         exec_sql(c, "INSERT INTO abas (nome, ordem) VALUES (?, ?)", ("Aba Principal", 0))
         conn.commit()
+        invalidate_view_cache()
         abas_rows = fetch_all(c, "SELECT id, nome, ordem FROM abas ORDER BY ordem")
 
     aba_ids = [a["id"] for a in abas_rows]
-
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 50, type=int)
-    search = request.args.get("search", "", type=str).strip()
-
-    per_page = max(10, min(200, per_page))
-    aba_atual = request.args.get("aba_id", type=int)
-
-    if aba_atual not in aba_ids:
-        aba_atual = aba_ids[0]
-
+    aba_atual = aba_candidate if aba_candidate in aba_ids else aba_ids[0]
     offset = (page - 1) * per_page
     search_like = f"%{search}%"
 
@@ -362,8 +342,120 @@ def index():
         )
 
     conn.close()
-
     total_pages = max(1, (total_produtos + per_page - 1) // per_page)
+    safe_page = min(page, total_pages)
+
+    payload = {
+        "abas": [{"id": a["id"], "nome": a["nome"]} for a in abas_rows],
+        "aba_atual": aba_atual,
+        "produtos": produtos,
+        "pagination": {
+            "current_page": safe_page,
+            "total_pages": total_pages,
+            "total_items": total_produtos,
+            "per_page": per_page,
+            "search_ref": search,
+        },
+        "max_urls": MAX_URLS,
+    }
+
+    if use_cache:
+        _cache_set(cache_key, payload)
+    return payload
+
+
+def save_image_bytes(file_bytes: bytes, extension: str) -> str:
+    safe_ext = extension.lower().replace(".", "")
+    safe_ext = safe_ext if safe_ext in {"jpg", "jpeg", "png"} else "jpg"
+    filename = f"img_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{uuid4().hex}.{safe_ext}"
+    full_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+
+    with open(full_path, "wb") as f:
+        f.write(file_bytes)
+
+    return url_for("static", filename=f"uploads/{filename}")
+
+
+def resize_to_max_dimension(image: Image.Image, max_dimension: int) -> Image.Image:
+    w, h = image.size
+    if max(w, h) <= max_dimension:
+        return image
+    scale = max_dimension / float(max(w, h))
+    new_size = (max(1, int(w * scale)), max(1, int(h * scale)))
+    return image.resize(new_size, Image.Resampling.LANCZOS)
+
+
+def encode_jpeg_to_target(image: Image.Image, target_bytes: int) -> bytes:
+    rgb = image.convert("RGB")
+    best = None
+    best_size = 10**12
+    work = rgb
+
+    for _ in range(9):
+        for quality in [95, 92, 89, 86, 82, 78, 74, 70, 66, 62, 58, 54]:
+            out = io.BytesIO()
+            work.save(out, format="JPEG", quality=quality, optimize=True, progressive=True)
+            raw = out.getvalue()
+            size = len(raw)
+            if size < best_size:
+                best = raw
+                best_size = size
+            if size <= target_bytes:
+                return raw
+
+        w, h = work.size
+        if w < 700 or h < 700:
+            break
+        work = work.resize((int(w * 0.93), int(h * 0.93)), Image.Resampling.LANCZOS)
+
+    return best if best is not None else b""
+
+
+def encode_png_to_target(image: Image.Image, target_bytes: int) -> bytes:
+    has_alpha = "A" in image.getbands()
+    base = image.convert("RGBA") if has_alpha else image.convert("RGB")
+    best = None
+    best_size = 10**12
+    work = base
+
+    for _ in range(7):
+        for colors in [256, 192, 160, 128, 96, 64]:
+            quantized = work.quantize(colors=colors, method=Image.MEDIANCUT)
+            out = io.BytesIO()
+            quantized.save(out, format="PNG", optimize=True, compress_level=9)
+            raw = out.getvalue()
+            size = len(raw)
+            if size < best_size:
+                best = raw
+                best_size = size
+            if size <= target_bytes:
+                return raw
+
+        w, h = work.size
+        if w < 700 or h < 700:
+            break
+        work = work.resize((int(w * 0.93), int(h * 0.93)), Image.Resampling.LANCZOS)
+
+    return best if best is not None else b""
+
+
+init_db()
+
+
+@app.route("/")
+def index():
+    payload = build_view_payload(
+        aba_param=request.args.get("aba_id", type=int),
+        page_param=request.args.get("page", 1, type=int),
+        per_page_param=request.args.get("per_page", 50, type=int),
+        search_param=request.args.get("search", "", type=str),
+        use_cache=True,
+    )
+
+    abas_rows = payload["abas"]
+    aba_atual = payload["aba_atual"]
+    produtos = payload["produtos"]
+    pagination_data = payload["pagination"]
 
     return render_template(
         "index.html",
@@ -373,14 +465,20 @@ def index():
         produtos={aba_atual: produtos},
         col_range=list(range(1, MAX_URLS + 1)),
         max_urls=MAX_URLS,
-        pagination_data={
-            "current_page": page,
-            "total_pages": total_pages,
-            "total_items": total_produtos,
-            "per_page": per_page,
-            "search_ref": search,
-        },
+        pagination_data=pagination_data,
     )
+
+
+@app.route("/api/view_data")
+def api_view_data():
+    payload = build_view_payload(
+        aba_param=request.args.get("aba_id", type=int),
+        page_param=request.args.get("page", 1, type=int),
+        per_page_param=request.args.get("per_page", 50, type=int),
+        search_param=request.args.get("search", "", type=str),
+        use_cache=True,
+    )
+    return jsonify(payload)
 
 
 @app.route("/importar", methods=["POST"])
@@ -491,6 +589,7 @@ def importar():
                 os.remove(path)
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return redirect(url_for("index"))
 
@@ -577,6 +676,7 @@ def adicionar_url():
     )
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True, ordem=ordem)
 
@@ -612,6 +712,7 @@ def excluir_imagem():
         exec_sql(c, "UPDATE imagens SET ordem = ? WHERE id = ?", (i, img["id"]))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -630,6 +731,7 @@ def reordenar():
         exec_sql(c, "INSERT INTO imagens (produto_id, url, ordem) VALUES (?, ?, ?)", (pid, url, ordem))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -643,6 +745,7 @@ def deletar_produto():
 
     exec_sql(c, "DELETE FROM produtos WHERE id = ?", (pid,))
     conn.commit()
+    invalidate_view_cache()
     conn.close()
 
     return jsonify(success=True)
@@ -659,6 +762,7 @@ def deletar_produtos_selecionados():
         exec_sql(c, "DELETE FROM produtos WHERE id = ?", (int(pid),))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -687,6 +791,7 @@ def mover_imagens():
         ordem += 1
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -719,6 +824,7 @@ def duplicar_produto():
         exec_sql(c, "INSERT INTO imagens (produto_id, url, ordem) VALUES (?, ?, ?)", (new_id, img["url"], img["ordem"]))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -737,6 +843,7 @@ def renomear_aba():
     exec_sql(c, "UPDATE abas SET nome = ? WHERE id = ?", (nome, aba_id))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -763,6 +870,7 @@ def excluir_aba():
     next_tab_id = next_tab_row["id"] if next_tab_row else None
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
 
     return jsonify(success=True, next_aba_id=next_tab_id)
@@ -799,6 +907,7 @@ def duplicar_aba():
             exec_sql(c, "INSERT INTO imagens (produto_id, url, ordem) VALUES (?, ?, ?)", (new_pid, img["url"], img["ordem"]))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -832,6 +941,7 @@ def mover_aba_cima():
         exec_sql(c, "UPDATE abas SET ordem = ? WHERE id = ?", (acima["ordem"], aba_id))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
 
     return jsonify(success=True)
@@ -866,6 +976,7 @@ def mover_aba_baixo():
         exec_sql(c, "UPDATE abas SET ordem = ? WHERE id = ?", (abaixo["ordem"], aba_id))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -881,6 +992,7 @@ def reordenar_abas():
         exec_sql(c, "UPDATE abas SET ordem = ? WHERE id = ?", (i, int(aba_id)))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -910,6 +1022,7 @@ def mover_para_coluna():
             exec_sql(c, "INSERT INTO imagens (produto_id, url, ordem) VALUES (?, ?, ?)", (pid, url, ordem))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -944,6 +1057,7 @@ def colar_imagens():
             ordem += 1
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
     return jsonify(success=True)
 
@@ -962,26 +1076,83 @@ def upload_imagem():
         return jsonify(error="Arquivo invalido"), 400
 
     original_kb = len(original_bytes) / 1024
-    final_bytes = original_bytes
-    ext = Path(file.filename).suffix.replace(".", "") or "jpg"
-    compressed = False
+    original_size_bytes = len(original_bytes)
 
-    if original_kb > COMPRESS_TRIGGER_KB:
-        final_bytes, ext = compress_to_target(original_bytes, TARGET_MAX_KB)
-        compressed = True
+    try:
+        img = Image.open(io.BytesIO(original_bytes))
+        img.load()
+    except Exception:
+        return jsonify(error="Arquivo de imagem invalido"), 400
+
+    detected_format = (img.format or "").upper()
+    if detected_format not in ALLOWED_IMAGE_FORMATS:
+        return jsonify(error="Formato invalido. Use somente JPG, JPEG ou PNG."), 400
+
+    img = ImageOps.exif_transpose(img)
+    resized_img = resize_to_max_dimension(img, MAX_DIMENSION_PX)
+    resized = resized_img.size != img.size
+
+    exceeds_size = original_size_bytes > MAX_UPLOAD_KB * 1024
+    needs_processing = exceeds_size or resized
+
+    # Se já estiver nas regras, mantém arquivo original.
+    if not needs_processing:
+        ext = "png" if detected_format == "PNG" else "jpg"
+        image_url = save_image_bytes(original_bytes, ext)
+        return jsonify(
+            url=image_url,
+            compressed=False,
+            resized=False,
+            original_kb=round(original_kb, 1),
+            final_kb=round(original_kb, 1),
+            final_format=detected_format,
+            message=None,
+        )
+
+    target_bytes = TARGET_UPLOAD_KB * 1024
+    has_alpha = "A" in resized_img.getbands()
+    final_format = "PNG" if has_alpha else "JPEG"
+
+    if final_format == "PNG":
+        final_bytes = encode_png_to_target(resized_img, target_bytes)
+        ext = "png"
+    else:
+        final_bytes = encode_jpeg_to_target(resized_img, target_bytes)
+        ext = "jpg"
+
+    if not final_bytes:
+        return jsonify(error="Falha ao processar imagem"), 500
+
+    # Segurança final para garantir teto de 1MB.
+    if len(final_bytes) > MAX_UPLOAD_KB * 1024:
+        reduced_img = resized_img.resize(
+            (
+                max(1, int(resized_img.size[0] * 0.9)),
+                max(1, int(resized_img.size[1] * 0.9)),
+            ),
+            Image.Resampling.LANCZOS,
+        )
+        if final_format == "PNG":
+            final_bytes = encode_png_to_target(reduced_img, MAX_UPLOAD_KB * 1024)
+            ext = "png"
+        else:
+            final_bytes = encode_jpeg_to_target(reduced_img, MAX_UPLOAD_KB * 1024)
+            ext = "jpg"
+
+    if len(final_bytes) > MAX_UPLOAD_KB * 1024:
+        return jsonify(error="Nao foi possivel ajustar a imagem para ate 1MB mantendo qualidade minima."), 400
 
     final_kb = len(final_bytes) / 1024
     image_url = save_image_bytes(final_bytes, ext)
-
-    message = None
-    if compressed:
-        message = f"Imagem compactada de {original_kb:.1f}KB para {final_kb:.1f}KB"
+    message = f"Imagem ajustada de {original_kb:.1f}KB para {final_kb:.1f}KB ({final_format})"
 
     return jsonify(
         url=image_url,
-        compressed=compressed,
+        compressed=True,
+        resized=resized,
         original_kb=round(original_kb, 1),
         final_kb=round(final_kb, 1),
+        final_format=final_format,
         message=message,
     )
 
@@ -1001,6 +1172,7 @@ def atualizar_nome():
     exec_sql(c, "UPDATE produtos SET nome = ? WHERE id = ?", (nome, pid))
 
     conn.commit()
+    invalidate_view_cache()
     conn.close()
 
     return jsonify(success=True)
@@ -1013,3 +1185,4 @@ def health():
 
 if __name__ == "__main__":
     app.run(debug=True)
+

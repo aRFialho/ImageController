@@ -375,6 +375,243 @@
       #moveColumnSelect {
         display: none;
       }
+
+      /* ===================== REFINO VISUAL MODERNO ===================== */
+      body {
+        min-height: 100vh;
+        background:
+          radial-gradient(1200px 500px at 5% -10%, rgba(59, 130, 246, 0.18), transparent 60%),
+          radial-gradient(900px 500px at 95% 0%, rgba(14, 165, 164, 0.2), transparent 62%),
+          linear-gradient(150deg, #f1f5f9, #edf4ff 45%, #eefdf8 100%);
+      }
+
+      .dark body {
+        background:
+          radial-gradient(1200px 500px at 5% -10%, rgba(56, 189, 248, 0.16), transparent 60%),
+          radial-gradient(900px 500px at 95% 0%, rgba(20, 184, 166, 0.18), transparent 62%),
+          linear-gradient(150deg, #0a1020, #0c1826 45%, #0b1f1c 100%);
+      }
+
+      .container-fluid {
+        position: relative;
+        z-index: 1;
+        padding: 18px 22px 32px;
+      }
+
+      .top-bar,
+      .excel-table,
+      .move-panel {
+        border-radius: 20px;
+        background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.75),
+            rgba(255, 255, 255, 0.52)
+          ),
+          var(--card);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        box-shadow:
+          0 16px 38px rgba(10, 30, 60, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.55);
+        backdrop-filter: blur(10px);
+      }
+
+      .dark .top-bar,
+      .dark .excel-table,
+      .dark .move-panel {
+        background: linear-gradient(
+          135deg,
+          rgba(14, 23, 38, 0.9),
+          rgba(10, 18, 31, 0.8)
+        );
+        border: 1px solid rgba(88, 129, 190, 0.26);
+        box-shadow:
+          0 14px 34px rgba(0, 0, 0, 0.45),
+          inset 0 1px 0 rgba(159, 196, 255, 0.08);
+      }
+
+      .btn {
+        border-radius: 14px !important;
+        border: 1px solid rgba(255, 255, 255, 0.45) !important;
+        backdrop-filter: blur(8px);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.28),
+          0 8px 18px rgba(15, 23, 42, 0.14);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #06b6d4, #0ea5a4) !important;
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #64748b, #475569) !important;
+      }
+
+      .btn-outline-danger {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.75),
+          rgba(255, 255, 255, 0.5)
+        ) !important;
+      }
+
+      .tabs-modern .nav-link {
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.52);
+        background: rgba(255, 255, 255, 0.58);
+        backdrop-filter: blur(6px);
+      }
+
+      .tabs-modern .nav-link.active {
+        background: linear-gradient(135deg, #0ea5a4, #0284c7);
+      }
+
+      .table thead th {
+        border-top: none !important;
+      }
+
+      .table tbody td {
+        vertical-align: top;
+      }
+
+      .form-control,
+      .form-select,
+      .input-group-text {
+        border-radius: 12px !important;
+        border: 1px solid rgba(148, 163, 184, 0.4) !important;
+        background: rgba(255, 255, 255, 0.8);
+      }
+
+      .dark .form-control,
+      .dark .form-select,
+      .dark .input-group-text {
+        background: rgba(15, 23, 42, 0.78);
+        border-color: rgba(100, 116, 139, 0.45) !important;
+        color: #e2e8f0;
+      }
+
+      .pagination .page-link {
+        border-radius: 12px !important;
+        margin-right: 6px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #0ea5a4, #0284c7);
+        border-color: transparent;
+      }
+
+      .floating-btn {
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        backdrop-filter: blur(10px);
+      }
+
+      .app-toast {
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.46);
+        backdrop-filter: blur(10px);
+      }
+
+      .app-toast.success {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.92), rgba(22, 163, 74, 0.92));
+        color: #fff;
+      }
+
+      .app-toast.error {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(185, 28, 28, 0.93));
+        color: #fff;
+      }
+
+      .app-toast.info {
+        background: linear-gradient(135deg, rgba(14, 165, 164, 0.95), rgba(2, 132, 199, 0.92));
+        color: #fff;
+      }
+
+      #appDialog .modal-content {
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.62);
+        background: linear-gradient(
+          140deg,
+          rgba(255, 255, 255, 0.84),
+          rgba(255, 255, 255, 0.62)
+        );
+        backdrop-filter: blur(12px);
+      }
+
+      .dark #appDialog .modal-content {
+        background: linear-gradient(
+          140deg,
+          rgba(15, 23, 42, 0.96),
+          rgba(10, 18, 31, 0.9)
+        );
+        border-color: rgba(96, 165, 250, 0.24);
+      }
+
+      #loadingOverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(10, 15, 30, 0.36);
+        backdrop-filter: blur(6px);
+      }
+
+      #loadingOverlay.show {
+        display: flex;
+      }
+
+      .loading-card {
+        min-width: 260px;
+        border-radius: 22px;
+        padding: 18px 20px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        background: linear-gradient(
+          140deg,
+          rgba(255, 255, 255, 0.86),
+          rgba(255, 255, 255, 0.62)
+        );
+        box-shadow: 0 24px 48px rgba(2, 6, 23, 0.25);
+      }
+
+      .dark .loading-card {
+        background: linear-gradient(
+          140deg,
+          rgba(15, 23, 42, 0.95),
+          rgba(10, 18, 31, 0.9)
+        );
+        border-color: rgba(148, 163, 184, 0.24);
+      }
+
+      .logo-spinner {
+        width: 82px;
+        height: 82px;
+        border-radius: 50%;
+        border: 3px solid rgba(14, 165, 164, 0.2);
+        border-top-color: #0ea5a4;
+        animation: logoSpin 1s linear infinite;
+        margin: 0 auto 10px auto;
+        display: grid;
+        place-items: center;
+      }
+
+      .logo-spinner img {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+      }
+
+      @keyframes logoSpin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
     </style>
 
     <script>
@@ -501,7 +738,7 @@
       </div>
 
       <!-- SELETOR DE ITENS POR PÃGINA -->
-      <div class="mb-3">
+      <div class="mb-3" id="perPageContainer">
         Mostrar:
         <a href="?aba_id={{aba_atual}}&page=1&per_page=25" class="ms-2">25</a> |
         <a href="?aba_id={{aba_atual}}&page=1&per_page=50" class="ms-2">50</a> |
@@ -526,7 +763,7 @@
               <th width="160">Acoes</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="produtosTbody">
             {% for produto in produtos[aba_atual] %}
             <tr data-produto-id="{{produto.id}}">
               <td><input type="checkbox" class="select-product" /></td>
@@ -587,22 +824,23 @@
                     <i class="fa fa-plus"></i>
                   </button>
                 </div>
-                <!-- UPLOAD DE ARQUIVO LOCAL -->
-                <div class="input-group input-group-sm mb-2">
+                <!-- ADICIONAR IMAGENS (UPLOAD AUTOMATICO) -->
+                <div class="mb-2 d-grid gap-1">
+                  <label
+                    for="fileUpload-{{produto.id}}"
+                    class="btn btn-secondary btn-sm"
+                  >
+                    <i class="fa fa-images"></i> Adicionar imagens
+                  </label>
                   <input
                     type="file"
-                    class="form-control"
-                    accept="image/*"
+                    class="d-none"
+                    accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                     multiple
                     id="fileUpload-{{produto.id}}"
+                    onchange="uploadArquivo({{produto.id}}, this.files)"
                   />
-
-                  <button
-                    class="btn btn-secondary btn-sm"
-                    onclick="uploadArquivo({{produto.id}})"
-                  >
-                    <i class="fa fa-upload"></i>
-                  </button>
+                  <small class="text-muted">JPG/JPEG/PNG | ate 1MB | max 2500px</small>
                 </div>
 
                 <button
@@ -628,7 +866,7 @@
 
       <!-- PAGINACAO -->
       <nav>
-        <ul class="pagination">
+        <ul class="pagination" id="paginationContainer">
           {% if pagination_data.current_page > 1 %}
           <li class="page-item">
             <a
@@ -693,7 +931,7 @@
     <!-- BOTÃƒO FLUTUANTE - MOVER IMAGENS PARA COLUNA -->
     <div class="move-column-float" id="moveColumnFloat">
       <select id="moveColumnSelect" class="form-select form-select-sm">
-        <option value="">Mover p/ Mover para coluna...</option>
+        <option value="">Mover para coluna...</option>
         {% for col in col_range %}
         <option value="{{col}}">Coluna {{col}}</option>
         {% endfor %}
@@ -717,6 +955,40 @@
             style="max-width: 100%; max-height: 80vh; border-radius: 10px"
           />
         </div>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="appToastContainer"></div>
+
+    <div class="modal fade" id="appDialog" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-2">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold" id="appDialogTitle">Confirmacao</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body pt-2">
+            <p id="appDialogMessage" class="mb-2"></p>
+            <input id="appDialogInput" class="form-control d-none" />
+          </div>
+          <div class="modal-footer border-0 pt-0">
+            <button type="button" class="btn btn-outline-secondary" id="appDialogCancelBtn">
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" id="appDialogConfirmBtn">
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="loadingOverlay" aria-hidden="true">
+      <div class="loading-card">
+        <div class="logo-spinner">
+          <img src="{{ url_for('static', filename='img/favicon.svg') }}" alt="Image Controller" />
+        </div>
+        <div class="fw-semibold">Carregando informacoes...</div>
       </div>
     </div>
 
@@ -776,33 +1048,376 @@
       const moveDestino = document.getElementById("moveDestino");
       const moveColumnSelect = document.getElementById("moveColumnSelect");
       const modalImageEl = document.getElementById("imgModalShow");
+      const loadingOverlay = document.getElementById("loadingOverlay");
+      const produtosTbody = document.getElementById("produtosTbody");
+      const paginationContainer = document.getElementById("paginationContainer");
+      const perPageContainer = document.getElementById("perPageContainer");
+      const toastContainer = document.getElementById("appToastContainer");
       const maxUrls = {{ max_urls }};
+      const clientViewCache = new Map();
+      const clientViewCacheTtlMs = 30000;
       let clipboardImages = [];
       let lastImageSelect = null;
       let lastProductSelect = null;
+      let currentViewState = null;
 
       const btnProducts = document.getElementById("deleteProductsBtn");
       const btnImages = document.getElementById("deleteImagesBtn");
       const copyImagesBtn = document.getElementById("copyImagesBtn");
       const pasteImagesBtn = document.getElementById("pasteImagesBtn");
       const moveColumnBtn = document.getElementById("moveColumnBtn");
+      const appDialogEl = document.getElementById("appDialog");
+      const appDialogTitle = document.getElementById("appDialogTitle");
+      const appDialogMessage = document.getElementById("appDialogMessage");
+      const appDialogInput = document.getElementById("appDialogInput");
+      const appDialogCancelBtn = document.getElementById("appDialogCancelBtn");
+      const appDialogConfirmBtn = document.getElementById("appDialogConfirmBtn");
+      const appDialog = new bootstrap.Modal(appDialogEl);
+
+      function uiToast(message, type = "info", ms = 3200) {
+        const toastEl = document.createElement("div");
+        toastEl.className = `toast show app-toast ${type}`;
+        toastEl.role = "alert";
+        toastEl.innerHTML = `
+          <div class="toast-body d-flex align-items-center gap-2">
+            <i class="fa ${type === "error" ? "fa-circle-exclamation" : type === "success" ? "fa-circle-check" : "fa-circle-info"}"></i>
+            <span>${message}</span>
+          </div>
+        `;
+        toastContainer.appendChild(toastEl);
+        setTimeout(() => {
+          toastEl.classList.remove("show");
+          toastEl.remove();
+        }, ms);
+      }
+
+      function uiConfirm(message, options = {}) {
+        return new Promise((resolve) => {
+          appDialogTitle.textContent = options.title || "Confirmacao";
+          appDialogMessage.textContent = message;
+          appDialogInput.classList.add("d-none");
+          appDialogInput.value = "";
+          appDialogConfirmBtn.textContent = options.confirmText || "Confirmar";
+          appDialogCancelBtn.textContent = options.cancelText || "Cancelar";
+          appDialogConfirmBtn.className = `btn ${options.variant || "btn-primary"}`;
+
+          const onConfirm = () => {
+            cleanup();
+            appDialog.hide();
+            resolve(true);
+          };
+          const onCancel = () => {
+            cleanup();
+            resolve(false);
+          };
+          const onHidden = () => {
+            cleanup();
+            resolve(false);
+          };
+          const cleanup = () => {
+            appDialogConfirmBtn.removeEventListener("click", onConfirm);
+            appDialogCancelBtn.removeEventListener("click", onCancel);
+            appDialogEl.removeEventListener("hidden.bs.modal", onHidden);
+          };
+
+          appDialogConfirmBtn.addEventListener("click", onConfirm);
+          appDialogCancelBtn.addEventListener("click", onCancel);
+          appDialogEl.addEventListener("hidden.bs.modal", onHidden, { once: true });
+          appDialog.show();
+        });
+      }
+
+      function uiPrompt(message, defaultValue = "", options = {}) {
+        return new Promise((resolve) => {
+          appDialogTitle.textContent = options.title || "Entrada";
+          appDialogMessage.textContent = message;
+          appDialogInput.classList.remove("d-none");
+          appDialogInput.value = defaultValue || "";
+          appDialogInput.placeholder = options.placeholder || "";
+          appDialogConfirmBtn.textContent = options.confirmText || "Salvar";
+          appDialogCancelBtn.textContent = options.cancelText || "Cancelar";
+          appDialogConfirmBtn.className = "btn btn-primary";
+
+          const onConfirm = () => {
+            const value = appDialogInput.value.trim();
+            cleanup();
+            appDialog.hide();
+            resolve(value);
+          };
+          const onCancel = () => {
+            cleanup();
+            resolve(null);
+          };
+          const onHidden = () => {
+            cleanup();
+            resolve(null);
+          };
+          const cleanup = () => {
+            appDialogConfirmBtn.removeEventListener("click", onConfirm);
+            appDialogCancelBtn.removeEventListener("click", onCancel);
+            appDialogEl.removeEventListener("hidden.bs.modal", onHidden);
+          };
+
+          appDialogConfirmBtn.addEventListener("click", onConfirm);
+          appDialogCancelBtn.addEventListener("click", onCancel);
+          appDialogEl.addEventListener("hidden.bs.modal", onHidden, { once: true });
+          appDialog.show();
+          setTimeout(() => appDialogInput.focus(), 80);
+        });
+      }
+
+      function showLoading(show) {
+        loadingOverlay.classList.toggle("show", !!show);
+      }
+
+      function parseStateFromUrl(urlInput = window.location.href) {
+        const url = new URL(urlInput, window.location.origin);
+        return {
+          aba_id: Number(url.searchParams.get("aba_id") || "{{ aba_atual }}"),
+          page: Number(url.searchParams.get("page") || "1"),
+          per_page: Number(url.searchParams.get("per_page") || "{{ pagination_data.per_page }}"),
+          search: (url.searchParams.get("search") || "").trim(),
+        };
+      }
+
+      function buildUrlFromState(state) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("aba_id", state.aba_id);
+        url.searchParams.set("page", state.page);
+        url.searchParams.set("per_page", state.per_page);
+        if (state.search) {
+          url.searchParams.set("search", state.search);
+        } else {
+          url.searchParams.delete("search");
+        }
+        return url.toString();
+      }
+
+      function cacheKeyForState(state) {
+        return `${state.aba_id}|${state.page}|${state.per_page}|${state.search.toLowerCase()}`;
+      }
+
+      function getCachedView(state) {
+        const key = cacheKeyForState(state);
+        const entry = clientViewCache.get(key);
+        if (!entry) return null;
+        if (Date.now() - entry.ts > clientViewCacheTtlMs) {
+          clientViewCache.delete(key);
+          return null;
+        }
+        return entry.payload;
+      }
+
+      function setCachedView(state, payload) {
+        const key = cacheKeyForState(state);
+        clientViewCache.set(key, { ts: Date.now(), payload });
+      }
+
+      function clearClientViewCache() {
+        clientViewCache.clear();
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = String(text ?? "");
+        return div.innerHTML;
+      }
+
+      function renderTabs(abas, abaAtual, pagination, search) {
+        const tabsContainer = document.getElementById("abasContainer");
+        tabsContainer.innerHTML = abas
+          .map((aba) => {
+            const activeClass = aba.id === abaAtual ? "active" : "";
+            const href = `?aba_id=${aba.id}&page=1&per_page=${pagination.per_page}${search ? `&search=${encodeURIComponent(search)}` : ""}`;
+            return `
+              <li class="nav-item aba-item" data-aba-id="${aba.id}">
+                <a class="nav-link ${activeClass}" href="${href}">
+                  ${escapeHtml(aba.nome)}
+                </a>
+              </li>
+            `;
+          })
+          .join("");
+      }
+
+      function renderPerPage(state) {
+        const options = [25, 50, 100, 200];
+        perPageContainer.innerHTML =
+          `Mostrar:` +
+          options
+            .map((n) => {
+              const href = `?aba_id=${state.aba_id}&page=1&per_page=${n}${state.search ? `&search=${encodeURIComponent(state.search)}` : ""}`;
+              return ` <a href="${href}" class="ms-2 ${state.per_page === n ? "fw-bold text-decoration-underline" : ""}">${n}</a>${n === 200 ? "" : " |"}`;
+            })
+            .join("");
+      }
+
+      function renderPagination(state, pagination) {
+        let html = "";
+        if (pagination.current_page > 1) {
+          const hrefPrev = `?aba_id=${state.aba_id}&page=${pagination.current_page - 1}&per_page=${state.per_page}${state.search ? `&search=${encodeURIComponent(state.search)}` : ""}`;
+          html += `<li class="page-item"><a class="page-link" href="${hrefPrev}"><< Anterior</a></li>`;
+        }
+
+        for (let p = 1; p <= pagination.total_pages; p++) {
+          const href = `?aba_id=${state.aba_id}&page=${p}&per_page=${state.per_page}${state.search ? `&search=${encodeURIComponent(state.search)}` : ""}`;
+          html += `<li class="page-item ${p === pagination.current_page ? "active" : ""}"><a class="page-link" href="${href}">${p}</a></li>`;
+        }
+
+        if (pagination.current_page < pagination.total_pages) {
+          const hrefNext = `?aba_id=${state.aba_id}&page=${pagination.current_page + 1}&per_page=${state.per_page}${state.search ? `&search=${encodeURIComponent(state.search)}` : ""}`;
+          html += `<li class="page-item"><a class="page-link" href="${hrefNext}">Proxima >></a></li>`;
+        }
+
+        paginationContainer.innerHTML = html;
+      }
+
+      function renderProducts(produtos) {
+        produtosTbody.innerHTML = produtos
+          .map((produto) => {
+            const imageTds = Array.from({ length: maxUrls }).map((_, idx) => {
+              const col = idx + 1;
+              const imageUrl = produto.urls[idx];
+              if (!imageUrl) {
+                return `<td><span class="text-muted">Sem imagem</span></td>`;
+              }
+              return `
+                <td>
+                  <div class="image-wrapper" data-image-index="${col}">
+                    <input type="checkbox" class="select-image" />
+                    <img src="${escapeHtml(imageUrl)}" onclick="abrirModal('${escapeHtml(imageUrl)}')" />
+                    <button class="btn btn-danger btn-sm" onclick="excluirImagem(this, ${produto.id})">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              `;
+            });
+
+            return `
+              <tr data-produto-id="${produto.id}">
+                <td><input type="checkbox" class="select-product" /></td>
+                <td class="fw-bold nome-cell">
+                  <textarea id="input-nome-${produto.id}" class="form-control form-control-sm" rows="2" style="resize: vertical">${escapeHtml(produto.nome)}</textarea>
+                  <button class="btn btn-primary btn-sm mt-1" onclick="salvarNome(${produto.id})">
+                    <i class="fa fa-save"></i>
+                  </button>
+                </td>
+                <td class="fw-bold">${escapeHtml(produto.referencia)}</td>
+                ${imageTds.join("")}
+                <td class="text-center">
+                  <div class="input-group input-group-sm mb-2">
+                    <input id="input-url-${produto.id}" class="form-control" placeholder="Nova URL" />
+                    <button class="btn btn-primary btn-sm" onclick="adicionarURL(${produto.id})">
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </div>
+                  <div class="mb-2 d-grid gap-1">
+                    <label for="fileUpload-${produto.id}" class="btn btn-secondary btn-sm">
+                      <i class="fa fa-images"></i> Adicionar imagens
+                    </label>
+                    <input type="file" class="d-none" accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple id="fileUpload-${produto.id}" onchange="uploadArquivo(${produto.id}, this.files)" />
+                    <small class="text-muted">JPG/JPEG/PNG | ate 1MB | max 2500px</small>
+                  </div>
+                  <button class="btn btn-secondary btn-sm mb-1" onclick="duplicarProduto(${produto.id})">
+                    <i class="fa fa-copy"></i> Duplicar
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm" onclick="deletarProduto(${produto.id})">
+                    <i class="fa fa-trash"></i> Remover
+                  </button>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+      }
+
+      function renderView(payload, state) {
+        searchRefInput.value = payload.pagination.search_ref || "";
+        const exportAbaInput = document.getElementById("exportAbaId");
+        if (exportAbaInput) exportAbaInput.value = payload.aba_atual;
+        renderTabs(payload.abas, payload.aba_atual, payload.pagination, payload.pagination.search_ref || "");
+        renderPerPage({
+          aba_id: payload.aba_atual,
+          per_page: payload.pagination.per_page,
+          search: payload.pagination.search_ref || "",
+        });
+        renderProducts(payload.produtos);
+        renderPagination(
+          {
+            aba_id: payload.aba_atual,
+            per_page: payload.pagination.per_page,
+            search: payload.pagination.search_ref || "",
+          },
+          payload.pagination,
+        );
+        currentViewState = {
+          aba_id: payload.aba_atual,
+          page: payload.pagination.current_page,
+          per_page: payload.pagination.per_page,
+          search: payload.pagination.search_ref || "",
+        };
+        initImageRows();
+        updateButtons();
+      }
+
+      async function silentNavigate(nextState, options = {}) {
+        const normalized = {
+          aba_id: Number(nextState.aba_id),
+          page: Math.max(1, Number(nextState.page || 1)),
+          per_page: Math.max(10, Number(nextState.per_page || 50)),
+          search: (nextState.search || "").trim(),
+        };
+
+        const cached = getCachedView(normalized);
+        if (cached && options.useCache !== false) {
+          renderView(cached, normalized);
+          if (options.pushHistory !== false) {
+            history.pushState(normalized, "", buildUrlFromState(normalized));
+          }
+          return;
+        }
+
+        showLoading(true);
+        try {
+          const url = new URL("/api/view_data", window.location.origin);
+          url.searchParams.set("aba_id", normalized.aba_id);
+          url.searchParams.set("page", normalized.page);
+          url.searchParams.set("per_page", normalized.per_page);
+          if (normalized.search) {
+            url.searchParams.set("search", normalized.search);
+          }
+
+          const resp = await fetch(url.toString(), { headers: { Accept: "application/json" } });
+          const data = await resp.json();
+          if (!resp.ok) {
+            uiToast(data.error || "Erro ao carregar informacoes.", "error");
+            return;
+          }
+
+          setCachedView(normalized, data);
+          renderView(data, normalized);
+          if (options.pushHistory !== false) {
+            history.pushState(currentViewState, "", buildUrlFromState(currentViewState));
+          }
+        } finally {
+          showLoading(false);
+        }
+      }
 
       function refreshCurrentPage() {
-        window.location.reload();
+        if (!currentViewState) currentViewState = parseStateFromUrl();
+        return silentNavigate(currentViewState, { pushHistory: false, useCache: false });
       }
 
       function applySearch() {
-        const url = new URL(window.location.href);
-        url.searchParams.set("search", searchRefInput.value.trim());
-        url.searchParams.set("page", 1);
-        window.location.href = url.toString();
+        const base = currentViewState || parseStateFromUrl();
+        silentNavigate({ ...base, page: 1, search: searchRefInput.value.trim() }, { pushHistory: true, useCache: true });
       }
 
       function clearSearch() {
-        const url = new URL(window.location.href);
-        url.searchParams.delete("search");
-        url.searchParams.set("page", 1);
-        window.location.href = url.toString();
+        const base = currentViewState || parseStateFromUrl();
+        silentNavigate({ ...base, page: 1, search: "" }, { pushHistory: true, useCache: true });
       }
 
       function abrirModal(src) {
@@ -852,12 +1467,16 @@
       async function adicionarURL(produtoId) {
         const input = document.getElementById("input-url-" + produtoId);
         const url = input.value.trim();
-        if (!url) return alert("Digite uma URL valida.");
+        if (!url) {
+          uiToast("Digite uma URL valida.", "error");
+          return;
+        }
 
         const container = getSortableContainer(produtoId);
         if (!container) return;
         if (container.querySelectorAll(".image-wrapper").length >= maxUrls) {
-          return alert(`Limite de ${maxUrls} imagens por produto.`);
+          uiToast(`Limite de ${maxUrls} imagens por produto.`, "error");
+          return;
         }
 
         const resp = await fetch("/adicionar_url", {
@@ -868,17 +1487,20 @@
 
         const data = await resp.json();
         if (!resp.ok || data.error) {
-          return alert(data.message || "Erro ao adicionar URL.");
+          uiToast(data.message || "Erro ao adicionar URL.", "error");
+          return;
         }
 
         const wrap = createImageWrapper(produtoId, url);
         container.appendChild(wrap);
         reindexWrappers(container);
         input.value = "";
+        clearClientViewCache();
       }
 
       async function excluirImagem(buttonEl, produtoId) {
-        if (!confirm("Excluir imagem?")) return;
+        const ok = await uiConfirm("Excluir imagem?", { title: "Confirmar exclusao", variant: "btn-outline-danger" });
+        if (!ok) return;
 
         const wrapper = buttonEl.closest(".image-wrapper");
         const container = wrapper.closest(".sortable-container");
@@ -892,16 +1514,19 @@
         });
 
         if (!resp.ok) {
-          return alert("Erro ao excluir imagem.");
+          uiToast("Erro ao excluir imagem.", "error");
+          return;
         }
 
         wrapper.remove();
         reindexWrappers(container);
         updateButtons();
+        clearClientViewCache();
       }
 
       async function deletarProduto(id) {
-        if (!confirm("Excluir produto?")) return;
+        const ok = await uiConfirm("Excluir produto?", { title: "Confirmar exclusao", variant: "btn-outline-danger" });
+        if (!ok) return;
 
         const resp = await fetch("/deletar_produto", {
           method: "POST",
@@ -909,10 +1534,14 @@
           body: JSON.stringify({ produto_id: id }),
         });
 
-        if (!resp.ok) return alert("Erro ao excluir produto.");
+        if (!resp.ok) {
+          uiToast("Erro ao excluir produto.", "error");
+          return;
+        }
         const row = getProductRow(id);
         if (row) row.remove();
         updateButtons();
+        clearClientViewCache();
       }
 
       async function duplicarProduto(id) {
@@ -922,7 +1551,11 @@
           body: JSON.stringify({ produto_id: id }),
         });
 
-        if (!resp.ok) return alert("Erro ao duplicar produto.");
+        if (!resp.ok) {
+          uiToast("Erro ao duplicar produto.", "error");
+          return;
+        }
+        clearClientViewCache();
         refreshCurrentPage();
       }
 
@@ -932,7 +1565,8 @@
         );
 
         if (!ids.length) return;
-        if (!confirm(`Excluir ${ids.length} produtos?`)) return;
+        const ok = await uiConfirm(`Excluir ${ids.length} produtos?`, { title: "Exclusao em massa", variant: "btn-outline-danger" });
+        if (!ok) return;
 
         const resp = await fetch("/deletar_produtos_selecionados", {
           method: "POST",
@@ -940,12 +1574,16 @@
           body: JSON.stringify({ prod_ids: ids }),
         });
 
-        if (!resp.ok) return alert("Erro ao excluir produtos.");
+        if (!resp.ok) {
+          uiToast("Erro ao excluir produtos.", "error");
+          return;
+        }
         ids.forEach((id) => {
           const row = getProductRow(id);
           if (row) row.remove();
         });
         updateButtons();
+        clearClientViewCache();
       }
 
       async function bulkDeleteImages() {
@@ -959,7 +1597,8 @@
         });
 
         if (!list.length) return;
-        if (!confirm(`Excluir ${list.length} imagens?`)) return;
+        const ok = await uiConfirm(`Excluir ${list.length} imagens?`, { title: "Exclusao em massa", variant: "btn-outline-danger" });
+        if (!ok) return;
 
         for (const item of list) {
           await fetch("/excluir_imagem", {
@@ -974,6 +1613,7 @@
           reindexWrappers(container);
         });
         updateButtons();
+        clearClientViewCache();
       }
 
       function updateButtons() {
@@ -1006,7 +1646,10 @@
           (chk) => chk.closest(".image-wrapper").querySelector("img").src,
         );
 
-        if (!clipboardImages.length) return alert("Selecione ao menos uma imagem para copiar.");
+        if (!clipboardImages.length) {
+          uiToast("Selecione ao menos uma imagem para copiar.", "error");
+          return;
+        }
 
         copyImagesBtn.innerText = `Copiadas ${clipboardImages.length}`;
         setTimeout(() => {
@@ -1017,14 +1660,20 @@
       }
 
       async function pasteImagesToSelectedProducts() {
-        if (!clipboardImages.length) return alert("Nenhuma imagem copiada.");
+        if (!clipboardImages.length) {
+          uiToast("Nenhuma imagem copiada.", "error");
+          return;
+        }
 
         const selectedRows = [...document.querySelectorAll(".select-product:checked")].map((chk) =>
           chk.closest("tr"),
         );
         const prodIds = selectedRows.map((row) => Number(row.dataset.produtoId));
 
-        if (!prodIds.length) return alert("Selecione pelo menos um produto alvo.");
+        if (!prodIds.length) {
+          uiToast("Selecione pelo menos um produto alvo.", "error");
+          return;
+        }
 
         const resp = await fetch("/colar_imagens", {
           method: "POST",
@@ -1032,7 +1681,10 @@
           body: JSON.stringify({ prod_ids: prodIds, urls: clipboardImages }),
         });
 
-        if (!resp.ok) return alert("Erro ao colar imagens.");
+        if (!resp.ok) {
+          uiToast("Erro ao colar imagens.", "error");
+          return;
+        }
 
         selectedRows.forEach((row) => {
           const pid = Number(row.dataset.produtoId);
@@ -1049,6 +1701,7 @@
         });
 
         updateButtons();
+        clearClientViewCache();
       }
 
       copyImagesBtn.addEventListener("click", copySelectedImages);
@@ -1064,7 +1717,10 @@
 
         if (e.shiftKey && lastImageSelect) {
           const lastCol = lastImageSelect.closest(".image-wrapper").dataset.imageIndex;
-          if (lastCol !== col) return alert("Selecao por coluna funciona apenas na mesma coluna.");
+          if (lastCol !== col) {
+            uiToast("Selecao por coluna funciona apenas na mesma coluna.", "error");
+            return;
+          }
 
           const start = colImages.indexOf(lastImageSelect);
           const end = colImages.indexOf(chk);
@@ -1148,6 +1804,8 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ produto_id: produtoId, urls }),
+              }).then(() => {
+                clearClientViewCache();
               });
             },
           });
@@ -1158,19 +1816,31 @@
         const origem = Number(moveOrigem.value);
         const destino = Number(moveDestino.value);
 
-        if (!origem || !destino) return alert("IDs invalidos.");
-        if (origem === destino) return alert("IDs iguais.");
+        if (!origem || !destino) {
+          uiToast("IDs invalidos.", "error");
+          return;
+        }
+        if (origem === destino) {
+          uiToast("IDs iguais.", "error");
+          return;
+        }
 
         fetch("/mover_imagens", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ origem, destino }),
-        }).then(() => refreshCurrentPage());
+        }).then(() => {
+          clearClientViewCache();
+          refreshCurrentPage();
+        });
       }
 
       document.getElementById("moveColumnBtn").addEventListener("click", () => {
         const coluna = Number(document.getElementById("moveColumnSelect").value);
-        if (!coluna) return alert("Selecione a coluna destino.");
+        if (!coluna) {
+          uiToast("Selecione a coluna destino.", "error");
+          return;
+        }
 
         const selecionadas = {};
         document.querySelectorAll(".select-image:checked").forEach((chk) => {
@@ -1183,50 +1853,68 @@
         });
 
         if (!Object.keys(selecionadas).length) {
-          return alert("Nenhuma imagem selecionada.");
+          uiToast("Nenhuma imagem selecionada.", "error");
+          return;
         }
 
         fetch("/mover_para_coluna", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ coluna, data: selecionadas }),
-        }).then(() => refreshCurrentPage());
+        }).then(() => {
+          clearClientViewCache();
+          refreshCurrentPage();
+        });
       });
 
       let abaClicada = null;
       const menu = document.getElementById("contextMenuAba");
 
-      document.querySelectorAll(".aba-item").forEach((aba) => {
-        aba.addEventListener("contextmenu", (e) => {
-          e.preventDefault();
-          abaClicada = aba;
-          menu.style.left = e.pageX + "px";
-          menu.style.top = e.pageY + "px";
-          menu.style.display = "block";
-        });
+      document.addEventListener("contextmenu", (e) => {
+        const aba = e.target.closest(".aba-item");
+        if (!aba) return;
+        e.preventDefault();
+        abaClicada = aba;
+        menu.style.left = e.pageX + "px";
+        menu.style.top = e.pageY + "px";
+        menu.style.display = "block";
       });
 
       document.addEventListener("click", () => (menu.style.display = "none"));
 
-      function renomearAba() {
-        const nome = prompt("Novo nome da aba:");
+      async function renomearAba() {
+        const nome = await uiPrompt("Novo nome da aba:", "", {
+          title: "Renomear aba",
+          confirmText: "Salvar",
+          placeholder: "Digite o nome da aba",
+        });
         if (!nome) return;
 
         fetch("/renomear_aba", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ aba_id: abaClicada.dataset.abaId, nome }),
-        }).then(() => refreshCurrentPage());
+        }).then(() => {
+          clearClientViewCache();
+          refreshCurrentPage();
+        });
       }
 
-      function excluirAba() {
-        if (!confirm("Excluir aba inteira e limpar seus dados?")) return;
+      async function excluirAba() {
+        const ok = await uiConfirm("Excluir aba inteira e limpar seus dados?", {
+          title: "Confirmar exclusao",
+          variant: "btn-outline-danger",
+        });
+        if (!ok) return;
 
         fetch("/excluir_aba", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ aba_id: abaClicada.dataset.abaId }),
-        }).then(() => refreshCurrentPage());
+        }).then(() => {
+          clearClientViewCache();
+          refreshCurrentPage();
+        });
       }
 
       function duplicarAba() {
@@ -1234,7 +1922,10 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ aba_id: abaClicada.dataset.abaId }),
-        }).then(() => refreshCurrentPage());
+        }).then(() => {
+          clearClientViewCache();
+          refreshCurrentPage();
+        });
       }
 
       function moverAbaCima() {
@@ -1242,7 +1933,10 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ aba_id: abaClicada.dataset.abaId }),
-        }).then(() => refreshCurrentPage());
+        }).then(() => {
+          clearClientViewCache();
+          refreshCurrentPage();
+        });
       }
 
       function moverAbaBaixo() {
@@ -1250,7 +1944,10 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ aba_id: abaClicada.dataset.abaId }),
-        }).then(() => refreshCurrentPage());
+        }).then(() => {
+          clearClientViewCache();
+          refreshCurrentPage();
+        });
       }
 
       new Sortable(document.getElementById("abasContainer"), {
@@ -1262,6 +1959,8 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ordem }),
+          }).then(() => {
+            clearClientViewCache();
           });
         },
       });
@@ -1298,12 +1997,12 @@
         updateButtons();
       });
 
-      async function uploadArquivo(produtoId) {
+      async function uploadArquivo(produtoId, selectedFiles = null) {
         const input = document.getElementById("fileUpload-" + produtoId);
-        const files = Array.from(input.files);
+        const files = Array.from(selectedFiles || input.files || []);
 
         if (!files.length) {
-          alert("Selecione pelo menos um arquivo.");
+          uiToast("Selecione pelo menos um arquivo.", "error");
           return;
         }
 
@@ -1323,7 +2022,7 @@
 
           const data = await resp.json();
           if (!resp.ok || !data.url) {
-            alert(data.error || "Erro no upload da imagem.");
+            uiToast(data.error || "Erro no upload da imagem.", "error");
             continue;
           }
 
@@ -1334,7 +2033,7 @@
           });
 
           if (!saveResp.ok) {
-            alert("Nao foi possivel salvar a imagem no produto.");
+            uiToast("Nao foi possivel salvar a imagem no produto.", "error");
             continue;
           }
 
@@ -1342,28 +2041,42 @@
             container.appendChild(createImageWrapper(produtoId, data.url));
             reindexWrappers(container);
           }
+          clearClientViewCache();
 
           if (data.compressed) {
-            compressedMessages.push(`${files[i].name}: ${data.original_kb}KB -> ${data.final_kb}KB`);
+            compressedMessages.push(
+              `${files[i].name}: ${data.original_kb}KB -> ${data.final_kb}KB (${data.final_format})`,
+            );
           }
         }
 
         input.value = "";
         if (compressedMessages.length) {
-          alert("Imagens compactadas:\n" + compressedMessages.join("\n"));
+          uiToast("Imagens ajustadas para ate 1MB.", "success");
+          compressedMessages.forEach((msg, idx) => {
+            setTimeout(() => uiToast(msg, "info", 4600), 300 * idx);
+          });
         }
       }
 
       function salvarNome(id) {
         const nome = document.getElementById("input-nome-" + id).value.trim();
-        if (!nome) return alert("Nome nao pode ser vazio.");
+        if (!nome) {
+          uiToast("Nome nao pode ser vazio.", "error");
+          return;
+        }
 
         fetch("/atualizar_nome", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ produto_id: id, nome }),
         }).then((r) => {
-          if (!r.ok) return alert("Erro ao salvar nome.");
+          if (!r.ok) {
+            uiToast("Erro ao salvar nome.", "error");
+            return;
+          }
+          clearClientViewCache();
+          uiToast("Nome salvo com sucesso.", "success");
         });
       }
 
@@ -1376,6 +2089,35 @@
         updateButtons();
       });
 
+      function setupSilentNavDelegation() {
+        document.addEventListener("click", (e) => {
+          const anchor = e.target.closest("a[href]");
+          if (!anchor) return;
+
+          const inSilentZone =
+            anchor.closest("#abasContainer") ||
+            anchor.closest("#paginationContainer") ||
+            anchor.closest("#perPageContainer");
+
+          if (!inSilentZone) return;
+
+          const href = anchor.getAttribute("href") || "";
+          if (!href.startsWith("?")) return;
+
+          e.preventDefault();
+          const targetUrl = new URL(href, window.location.origin);
+          const nextState = parseStateFromUrl(targetUrl.toString());
+          silentNavigate(nextState, { pushHistory: true, useCache: true });
+        });
+
+        window.addEventListener("popstate", () => {
+          const state = parseStateFromUrl();
+          silentNavigate(state, { pushHistory: false, useCache: true });
+        });
+      }
+
+      currentViewState = parseStateFromUrl();
+      setupSilentNavDelegation();
       initImageRows();
       updateButtons();
     </script>
