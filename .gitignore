@@ -1,0 +1,7 @@
+﻿__pycache__/
+*.pyc
+.env
+uploads/
+static/uploads/
+exports/
+*.db

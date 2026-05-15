@@ -1,0 +1,1387 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image Controller</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- FontAwesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <style>
+      /* ========== Root / Theme variables ========== */
+      :root {
+        --bg: #eef2f6;
+        --card: #ffffff;
+        --muted: #6c757d;
+        --text: #102134;
+        --accent: #0ea5a4;
+        --table-head: #f6f8fb;
+        --border: rgba(0, 0, 0, 0.08);
+        --shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+        --selected-outline: #0ea5a4;
+      }
+
+      .dark {
+        --bg: #0f1720;
+        --card: #0b1220;
+        --muted: #a5b1c2;
+        --text: #e6eef8;
+        --accent: #22d3ee;
+        --table-head: #0b1320;
+        --border: rgba(255, 255, 255, 0.06);
+        --shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+        --selected-outline: #22d3ee;
+      }
+
+      /* smooth transitions when toggling theme */
+      * {
+        transition:
+          background-color 0.18s ease,
+          color 0.18s ease,
+          border-color 0.18s ease;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Manrope", "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Barra superior */
+      .top-bar {
+        background:
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.03),
+            rgba(255, 255, 255, 0)
+          ),
+          var(--card);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+      }
+
+      /* Abas */
+      .tabs-modern .nav-link {
+        border-radius: 6px;
+        margin-right: 8px;
+        background: transparent;
+        color: var(--muted);
+        font-weight: 500;
+        padding: 8px 14px;
+        border: 1px solid transparent;
+      }
+      .tabs-modern .nav-link.active {
+        background: var(--accent);
+        color: white;
+        box-shadow: 0 6px 18px rgba(13, 110, 253, 0.12);
+      }
+
+      .aba-item {
+        cursor: pointer;
+      }
+
+      /* Menu contextual das abas */
+      .context-menu {
+        position: absolute;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        padding: 6px 0;
+        display: none;
+        z-index: 9999;
+        min-width: 160px;
+      }
+      .context-menu-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        color: var(--text);
+      }
+      .context-menu-item:hover {
+        background: var(--accent);
+        color: white;
+      }
+
+      /* Tabela */
+      .excel-table {
+        background: var(--card);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+      }
+
+      table thead {
+        background: var(--table-head);
+        color: var(--text);
+      }
+
+      table {
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      table.table-bordered td,
+      table.table-bordered th {
+        border: 1px solid var(--border) !important;
+      }
+
+      .image-wrapper {
+        width: 110px;
+        height: 110px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: transparent;
+        border-radius: 8px;
+      }
+
+      /* CHECKBOX â€“ restaurado */
+      .image-wrapper input.select-image {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 18px;
+        height: 18px;
+        z-index: 20;
+        cursor: pointer;
+        accent-color: var(--accent);
+      }
+
+      /* BotÃ£o excluir - somente Ã­cone vermelho, sem fundo forte */
+      .image-wrapper .btn-danger.btn-sm {
+        padding: 4px 6px !important;
+        font-size: 12px !important;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        z-index: 20;
+        background: transparent;
+        border: 1px solid rgba(220, 53, 69, 0.12);
+        color: #dc3545;
+        box-shadow: none;
+      }
+      .image-wrapper .btn-danger.btn-sm:hover {
+        background: rgba(220, 53, 69, 0.08);
+      }
+
+      .image-wrapper img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      /* SeleÃ§Ã£o visual */
+      .selected-img-container {
+        outline: 3px solid var(--selected-outline);
+        outline-offset: 3px;
+        border-radius: 8px;
+      }
+      .selected-row {
+        background: rgba(78, 168, 255, 0.08) !important;
+      }
+
+      /* Drag container */
+      .sortable-container {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap; /* allow wrap but keep items side-by-side when possible */
+      }
+
+      /* Painel mover imagens */
+      .move-panel {
+        background: var(--card);
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        margin-bottom: 20px;
+        border: 1px solid var(--border);
+      }
+
+      /* BotÃµes flutuantes */
+      .floating-btn {
+        position: fixed;
+        right: 25px;
+        z-index: 900;
+        padding: 10px 14px;
+        border-radius: 30px;
+        font-size: 14px;
+        display: none;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 6px 20px rgba(2, 6, 23, 0.2);
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      #deleteProductsBtn {
+        bottom: 25px;
+        background: #dc3545;
+      }
+      #deleteImagesBtn {
+        bottom: 80px;
+        background: var(--accent);
+      }
+      #copyImagesBtn {
+        bottom: 135px;
+        background: #6f42c1;
+      }
+      #pasteImagesBtn {
+        bottom: 190px;
+        background: #fd7e14;
+      }
+
+      /* container do move column (flutuante) */
+      .move-column-float {
+        position: fixed;
+        bottom: 250px;
+        right: 25px;
+        z-index: 900;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .move-column-float .form-select {
+        width: 140px;
+        height: 38px;
+        padding: 6px 10px;
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .move-column-float .btn {
+        height: 38px;
+        padding: 6px 12px;
+      }
+
+      /* small helpers */
+      .fw-bold {
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      /* Toggle switch */
+      .theme-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        user-select: none;
+      }
+      .theme-toggle .btn {
+        padding: 6px 10px;
+      }
+
+      /* make table responsive on small screens */
+      @media (max-width: 992px) {
+        .sortable-container {
+          gap: 8px;
+        }
+        .image-wrapper {
+          width: 90px;
+          height: 90px;
+        }
+        .image-wrapper img {
+          width: 82px;
+          height: 82px;
+        }
+      }
+      td.nome-cell {
+        white-space: normal !important;
+        word-break: break-word !important;
+        max-width: 180px; /* opcional */
+      }
+      /* ===================== DARK MODE TABELA ===================== */
+
+      .dark .excel-table {
+        background: #2c2c2c !important;
+        color: #e8e8e8 !important;
+        border-color: #444 !important;
+      }
+
+      .dark table thead {
+        background: #3a3a3a !important;
+        color: #f1f1f1 !important;
+      }
+
+      .dark .table-bordered > :not(caption) > * > * {
+        border-color: #555 !important;
+      }
+
+      .dark .image-wrapper img {
+        border-color: #555 !important;
+      }
+
+      .dark .image-wrapper {
+        background: #1e1e1e !important;
+      }
+
+      .dark .selected-row {
+        background: #3b4b64 !important;
+      }
+
+      .dark .selected-img-container {
+        outline-color: #4a7fff !important;
+      }
+
+      /* ===================== MOVER COLUNA ===================== */
+
+      #moveColumnBtn {
+        background: #ffc107 !important;
+        color: #000 !important;
+        border: 1px solid #d39e00 !important;
+        border-radius: 6px;
+      }
+
+      .dark #moveColumnBtn {
+        background: #e3b645 !important;
+        color: #000 !important;
+      }
+
+      /* Ocultar select quando sem imagens selecionadas */
+      #moveColumnSelect {
+        display: none;
+      }
+    </style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const exp = document.getElementById("exportAbaId");
+        if (exp) exp.value = "{{ aba_atual }}";
+      });
+    </script>
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <!-- TOPO -->
+      <div class="top-bar d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Image Controller" style="height:42px" />
+          <h2 class="fw-bold m-0">Image Controller</h2>
+        </div>
+
+        <div class="d-flex gap-3 align-items-center">
+          <!-- theme toggle -->
+          <div class="theme-toggle">
+            <button
+              id="themeToggleBtn"
+              class="btn btn-outline-secondary btn-sm"
+              title="Alternar tema"
+            >
+              <i id="themeIcon" class="fa fa-moon"></i>
+            </button>
+          </div>
+
+          <!-- Importar -->
+          <form
+            action="/importar"
+            method="POST"
+            enctype="multipart/form-data"
+            class="d-flex gap-2"
+          >
+            <input
+              type="file"
+              name="files"
+              class="form-control"
+              accept=".xlsx,.xls,.csv" multiple required
+            />
+            <button class="btn btn-primary">
+              <i class="fa fa-file-import"></i> Importar planilhas
+            </button>
+          </form>
+
+          <!-- Exportar -->
+          <form action="/exportar" method="POST">
+            <input type="hidden" name="aba_id" id="exportAbaId" />
+            <button class="btn btn-success">
+              <i class="fa fa-file-export"></i> Exportar
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ABAS -->
+      <ul class="nav nav-tabs tabs-modern mb-4" id="abasContainer">
+        {% for idx,(aba_id,nome) in enumerated_abas %}
+        <li class="nav-item aba-item" data-aba-id="{{aba_id}}">
+          <a
+            class="nav-link {% if aba_id == aba_atual %}active{% endif %}"
+            href="?aba_id={{aba_id}}&page=1&per_page={{pagination_data.per_page}}"
+          >
+            {{nome}}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <!-- MENU CONTEXTUAL -->
+      <div id="contextMenuAba" class="context-menu">
+        <div class="context-menu-item" onclick="renomearAba()">
+          Renomear aba
+        </div>
+        <div class="context-menu-item" onclick="duplicarAba()">
+          Duplicar aba
+        </div>
+        <div class="context-menu-item" onclick="excluirAba()">Excluir aba</div>
+        <div class="context-menu-item" onclick="moverAbaCima()">
+          Mover para cima
+        </div>
+        <div class="context-menu-item" onclick="moverAbaBaixo()">
+          Mover para baixo
+        </div>
+      </div>
+
+      <!-- MOVER IMAGENS ENTRE PRODUTOS -->
+      <div class="move-panel">
+        <h5 class="fw-bold">Mover imagens entre produtos</h5>
+        <div class="d-flex gap-3 mt-2">
+          <div>
+            <label>ID Origem</label>
+            <input id="moveOrigem" type="number" class="form-control" />
+          </div>
+          <div>
+            <label>ID Destino</label>
+            <input id="moveDestino" type="number" class="form-control" />
+          </div>
+          <button onclick="moverImagens()" class="btn btn-primary mt-4">
+            <i class="fa fa-share"></i> Mover
+          </button>
+        </div>
+      </div>
+
+      <!-- BUSCA -->
+      <div class="input-group mb-3" style="max-width: 420px">
+        <span class="input-group-text"><i class="fa fa-search"></i></span>
+        <input
+          id="searchRef"
+          class="form-control"
+          placeholder="Buscar por referencia ou nome..."
+          value="{{pagination_data.search_ref}}"
+        />
+        <button class="btn btn-outline-secondary" onclick="applySearch()">
+          Buscar
+        </button>
+        <button class="btn btn-outline-secondary" onclick="clearSearch()">
+          Limpar
+        </button>
+      </div>
+
+      <!-- SELETOR DE ITENS POR PÃGINA -->
+      <div class="mb-3">
+        Mostrar:
+        <a href="?aba_id={{aba_atual}}&page=1&per_page=25" class="ms-2">25</a> |
+        <a href="?aba_id={{aba_atual}}&page=1&per_page=50" class="ms-2">50</a> |
+        <a href="?aba_id={{aba_atual}}&page=1&per_page=100" class="ms-2">100</a>
+        |
+        <a href="?aba_id={{aba_atual}}&page=1&per_page=200" class="ms-2">200</a>
+      </div>
+
+      <!-- TABELA -->
+      <div class="excel-table">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th width="40">
+                <input type="checkbox" id="selectAllProducts" />
+              </th>
+              <th width="160">Nome</th>
+              <th width="160">Referencia</th>
+              {% for col in col_range %}
+              <th>URL {{col}}</th>
+              {% endfor %}
+              <th width="160">Acoes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for produto in produtos[aba_atual] %}
+            <tr data-produto-id="{{produto.id}}">
+              <td><input type="checkbox" class="select-product" /></td>
+              <td class="fw-bold nome-cell">
+                <textarea
+                  id="input-nome-{{produto.id}}"
+                  class="form-control form-control-sm"
+                  rows="2"
+                  style="resize: vertical"
+                >
+{{produto.nome}}</textarea
+                >
+
+                <button
+                  class="btn btn-primary btn-sm mt-1"
+                  onclick="salvarNome({{produto.id}})"
+                >
+                  <i class="fa fa-save"></i>
+                </button>
+              </td>
+
+              <td class="fw-bold">{{produto.referencia}}</td>
+
+              {% for col in col_range %}
+              <td>
+                {% if col <= produto.urls|length %}
+                <div class="image-wrapper" data-image-index="{{col}}">
+                  <input type="checkbox" class="select-image" />
+                  <img
+                    src="{{produto.urls[col-1]}}"
+                    onclick="abrirModal('{{produto.urls[col-1]}}')"
+                  />
+
+                  <button
+                    class="btn btn-danger btn-sm"
+                    onclick="excluirImagem(this, {{produto.id}})"
+                  >
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+                {% else %}
+                <span class="text-muted">Sem imagem</span>
+                {% endif %}
+              </td>
+              {% endfor %}
+              <!-- AÃ‡Ã•ES DO PRODUTO -->
+              <td class="text-center">
+                <div class="input-group input-group-sm mb-2">
+                  <input
+                    id="input-url-{{produto.id}}"
+                    class="form-control"
+                    placeholder="Nova URL"
+                  />
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="adicionarURL({{produto.id}})"
+                  >
+                    <i class="fa fa-plus"></i>
+                  </button>
+                </div>
+                <!-- UPLOAD DE ARQUIVO LOCAL -->
+                <div class="input-group input-group-sm mb-2">
+                  <input
+                    type="file"
+                    class="form-control"
+                    accept="image/*"
+                    multiple
+                    id="fileUpload-{{produto.id}}"
+                  />
+
+                  <button
+                    class="btn btn-secondary btn-sm"
+                    onclick="uploadArquivo({{produto.id}})"
+                  >
+                    <i class="fa fa-upload"></i>
+                  </button>
+                </div>
+
+                <button
+                  class="btn btn-secondary btn-sm mb-1"
+                  onclick="duplicarProduto({{produto.id}})"
+                >
+                  <i class="fa fa-copy"></i> Duplicar
+                </button>
+
+                <button
+                  class="btn btn-outline-danger btn-sm"
+                  onclick="deletarProduto({{produto.id}})"
+                >
+                  <i class="fa fa-trash"></i> Remover
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <!-- excel-table -->
+
+      <!-- PAGINACAO -->
+      <nav>
+        <ul class="pagination">
+          {% if pagination_data.current_page > 1 %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="?aba_id={{aba_atual}}&page={{pagination_data.current_page-1}}&per_page={{pagination_data.per_page}}&search={{pagination_data.search_ref}}"
+            >
+              << Anterior
+            </a>
+          </li>
+          {% endif %} {% for p in range(1, pagination_data.total_pages + 1) %}
+          <li
+            class="page-item {% if p == pagination_data.current_page %}active{% endif %}"
+          >
+            <a
+              class="page-link"
+              href="?aba_id={{aba_atual}}&page={{p}}&per_page={{pagination_data.per_page}}&search={{pagination_data.search_ref}}"
+            >
+              {{p}}
+            </a>
+          </li>
+          {% endfor %} {% if pagination_data.current_page <
+          pagination_data.total_pages %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="?aba_id={{aba_atual}}&page={{pagination_data.current_page+1}}&per_page={{pagination_data.per_page}}&search={{pagination_data.search_ref}}"
+            >
+              Proxima >>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    <!-- container-fluid -->
+
+    <!-- BOTÃ•ES FLUTUANTES -->
+    <button id="deleteProductsBtn" class="floating-btn">
+      <i class="fa fa-trash"></i> Excluir produtos
+    </button>
+
+    <button id="deleteImagesBtn" class="floating-btn">
+      <i class="fa fa-trash"></i> Excluir imagens
+    </button>
+
+    <button
+      id="copyImagesBtn"
+      class="floating-btn"
+      title="Copiar imagens selecionadas"
+    >
+      <i class="fa fa-copy"></i> Copiar imagens
+    </button>
+
+    <button
+      id="pasteImagesBtn"
+      class="floating-btn"
+      title="Colar imagens nos produtos selecionados"
+    >
+      <i class="fa fa-paste"></i> Colar imagens
+    </button>
+
+    <!-- BOTÃƒO FLUTUANTE - MOVER IMAGENS PARA COLUNA -->
+    <div class="move-column-float" id="moveColumnFloat">
+      <select id="moveColumnSelect" class="form-select form-select-sm">
+        <option value="">Mover p/ Mover para coluna...</option>
+        {% for col in col_range %}
+        <option value="{{col}}">Coluna {{col}}</option>
+        {% endfor %}
+      </select>
+
+      <button
+        id="moveColumnBtn"
+        class="btn btn-warning btn-sm"
+        style="display: none"
+      >
+        <i class="fa fa-arrows-left-right"></i> Mover
+      </button>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal fade" id="modalImagem">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content p-2 text-center">
+          <img
+            id="imgModalShow"
+            style="max-width: 100%; max-height: 80vh; border-radius: 10px"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOTSTRAP -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      /* ============================
+   THEME TOGGLE
+   - saves preference in localStorage
+   - toggles 'dark' class on <html> element
+   ============================ */
+      (function () {
+        const root = document.documentElement;
+        const btn = document.getElementById("themeToggleBtn");
+        const icon = document.getElementById("themeIcon");
+        const storageKey = "gerenciador_theme";
+
+        function applyTheme(theme) {
+          if (theme === "dark") {
+            root.classList.add("dark");
+            icon.className = "fa fa-sun";
+            btn.classList.remove("btn-outline-secondary");
+            btn.classList.add("btn-dark");
+          } else {
+            root.classList.remove("dark");
+            icon.className = "fa fa-moon";
+            btn.classList.remove("btn-dark");
+            btn.classList.add("btn-outline-secondary");
+          }
+        }
+
+        // initial: check localStorage or prefers-color-scheme
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          applyTheme(saved);
+        } else {
+          const prefersDark =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches;
+          applyTheme(prefersDark ? "dark" : "light");
+        }
+
+        btn.addEventListener("click", () => {
+          const isDark = document.documentElement.classList.contains("dark");
+          const next = isDark ? "light" : "dark";
+          localStorage.setItem(storageKey, next);
+          applyTheme(next);
+        });
+      })();
+
+      /* ============================
+   CORE APP JS
+   ============================ */
+      const searchRefInput = document.getElementById("searchRef");
+      const moveOrigem = document.getElementById("moveOrigem");
+      const moveDestino = document.getElementById("moveDestino");
+      const moveColumnSelect = document.getElementById("moveColumnSelect");
+      const modalImageEl = document.getElementById("imgModalShow");
+      const maxUrls = {{ max_urls }};
+      let clipboardImages = [];
+      let lastImageSelect = null;
+      let lastProductSelect = null;
+
+      const btnProducts = document.getElementById("deleteProductsBtn");
+      const btnImages = document.getElementById("deleteImagesBtn");
+      const copyImagesBtn = document.getElementById("copyImagesBtn");
+      const pasteImagesBtn = document.getElementById("pasteImagesBtn");
+      const moveColumnBtn = document.getElementById("moveColumnBtn");
+
+      function refreshCurrentPage() {
+        window.location.reload();
+      }
+
+      function applySearch() {
+        const url = new URL(window.location.href);
+        url.searchParams.set("search", searchRefInput.value.trim());
+        url.searchParams.set("page", 1);
+        window.location.href = url.toString();
+      }
+
+      function clearSearch() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete("search");
+        url.searchParams.set("page", 1);
+        window.location.href = url.toString();
+      }
+
+      function abrirModal(src) {
+        modalImageEl.src = src;
+        new bootstrap.Modal(document.getElementById("modalImagem")).show();
+      }
+
+      function getProductRow(produtoId) {
+        return document.querySelector(`tr[data-produto-id="${produtoId}"]`);
+      }
+
+      function getSortableContainer(produtoId) {
+        const row = getProductRow(produtoId);
+        return row ? row.querySelector(".sortable-container") : null;
+      }
+
+      function reindexWrappers(container) {
+        const wrappers = [...container.querySelectorAll(".image-wrapper")];
+        wrappers.forEach((wrap, index) => {
+          wrap.dataset.imageIndex = String(index + 1);
+        });
+      }
+
+      function createImageWrapper(produtoId, imageUrl) {
+        const wrap = document.createElement("div");
+        wrap.className = "image-wrapper";
+
+        const chk = document.createElement("input");
+        chk.type = "checkbox";
+        chk.className = "select-image";
+
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.onclick = () => abrirModal(imageUrl);
+
+        const btn = document.createElement("button");
+        btn.className = "btn btn-danger btn-sm";
+        btn.innerHTML = '<i class="fa fa-trash"></i>';
+        btn.onclick = () => excluirImagem(btn, produtoId);
+
+        wrap.appendChild(chk);
+        wrap.appendChild(img);
+        wrap.appendChild(btn);
+        return wrap;
+      }
+
+      async function adicionarURL(produtoId) {
+        const input = document.getElementById("input-url-" + produtoId);
+        const url = input.value.trim();
+        if (!url) return alert("Digite uma URL valida.");
+
+        const container = getSortableContainer(produtoId);
+        if (!container) return;
+        if (container.querySelectorAll(".image-wrapper").length >= maxUrls) {
+          return alert(`Limite de ${maxUrls} imagens por produto.`);
+        }
+
+        const resp = await fetch("/adicionar_url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ produto_id: produtoId, url }),
+        });
+
+        const data = await resp.json();
+        if (!resp.ok || data.error) {
+          return alert(data.message || "Erro ao adicionar URL.");
+        }
+
+        const wrap = createImageWrapper(produtoId, url);
+        container.appendChild(wrap);
+        reindexWrappers(container);
+        input.value = "";
+      }
+
+      async function excluirImagem(buttonEl, produtoId) {
+        if (!confirm("Excluir imagem?")) return;
+
+        const wrapper = buttonEl.closest(".image-wrapper");
+        const container = wrapper.closest(".sortable-container");
+        const col = Number(wrapper.dataset.imageIndex || 0);
+        if (!col) return;
+
+        const resp = await fetch("/excluir_imagem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ produto_id: Number(produtoId), col }),
+        });
+
+        if (!resp.ok) {
+          return alert("Erro ao excluir imagem.");
+        }
+
+        wrapper.remove();
+        reindexWrappers(container);
+        updateButtons();
+      }
+
+      async function deletarProduto(id) {
+        if (!confirm("Excluir produto?")) return;
+
+        const resp = await fetch("/deletar_produto", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ produto_id: id }),
+        });
+
+        if (!resp.ok) return alert("Erro ao excluir produto.");
+        const row = getProductRow(id);
+        if (row) row.remove();
+        updateButtons();
+      }
+
+      async function duplicarProduto(id) {
+        const resp = await fetch("/duplicar_produto", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ produto_id: id }),
+        });
+
+        if (!resp.ok) return alert("Erro ao duplicar produto.");
+        refreshCurrentPage();
+      }
+
+      async function bulkDeleteProducts() {
+        const ids = [...document.querySelectorAll(".select-product:checked")].map((c) =>
+          Number(c.closest("tr").dataset.produtoId),
+        );
+
+        if (!ids.length) return;
+        if (!confirm(`Excluir ${ids.length} produtos?`)) return;
+
+        const resp = await fetch("/deletar_produtos_selecionados", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prod_ids: ids }),
+        });
+
+        if (!resp.ok) return alert("Erro ao excluir produtos.");
+        ids.forEach((id) => {
+          const row = getProductRow(id);
+          if (row) row.remove();
+        });
+        updateButtons();
+      }
+
+      async function bulkDeleteImages() {
+        const list = [...document.querySelectorAll(".select-image:checked")].map((c) => {
+          const wrap = c.closest(".image-wrapper");
+          return {
+            produto_id: Number(c.closest("tr").dataset.produtoId),
+            col: Number(wrap.dataset.imageIndex),
+            wrap,
+          };
+        });
+
+        if (!list.length) return;
+        if (!confirm(`Excluir ${list.length} imagens?`)) return;
+
+        for (const item of list) {
+          await fetch("/excluir_imagem", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ produto_id: item.produto_id, col: item.col }),
+          });
+          if (item.wrap) item.wrap.remove();
+        }
+
+        document.querySelectorAll(".sortable-container").forEach((container) => {
+          reindexWrappers(container);
+        });
+        updateButtons();
+      }
+
+      function updateButtons() {
+        const selImgs = document.querySelectorAll(".select-image:checked").length;
+        const selProducts = document.querySelectorAll(".select-product:checked").length;
+
+        btnProducts.style.display = selProducts ? "flex" : "none";
+        btnImages.style.display = selImgs ? "flex" : "none";
+        copyImagesBtn.style.display = selImgs ? "flex" : "none";
+        pasteImagesBtn.style.display = clipboardImages.length && selProducts ? "flex" : "none";
+        moveColumnBtn.style.display = selImgs ? "inline-block" : "none";
+        moveColumnSelect.style.display = selImgs ? "block" : "none";
+      }
+
+      document.addEventListener("change", (e) => {
+        if (e.target.classList.contains("select-product")) {
+          e.target.closest("tr").classList.toggle("selected-row", e.target.checked);
+        }
+        if (e.target.classList.contains("select-image")) {
+          e.target.closest(".image-wrapper").classList.toggle("selected-img-container", e.target.checked);
+        }
+        updateButtons();
+      });
+
+      btnProducts.onclick = bulkDeleteProducts;
+      btnImages.onclick = bulkDeleteImages;
+
+      function copySelectedImages() {
+        clipboardImages = [...document.querySelectorAll(".select-image:checked")].map(
+          (chk) => chk.closest(".image-wrapper").querySelector("img").src,
+        );
+
+        if (!clipboardImages.length) return alert("Selecione ao menos uma imagem para copiar.");
+
+        copyImagesBtn.innerText = `Copiadas ${clipboardImages.length}`;
+        setTimeout(() => {
+          copyImagesBtn.innerHTML = '<i class="fa fa-copy"></i> Copiar imagens';
+        }, 1500);
+
+        updateButtons();
+      }
+
+      async function pasteImagesToSelectedProducts() {
+        if (!clipboardImages.length) return alert("Nenhuma imagem copiada.");
+
+        const selectedRows = [...document.querySelectorAll(".select-product:checked")].map((chk) =>
+          chk.closest("tr"),
+        );
+        const prodIds = selectedRows.map((row) => Number(row.dataset.produtoId));
+
+        if (!prodIds.length) return alert("Selecione pelo menos um produto alvo.");
+
+        const resp = await fetch("/colar_imagens", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prod_ids: prodIds, urls: clipboardImages }),
+        });
+
+        if (!resp.ok) return alert("Erro ao colar imagens.");
+
+        selectedRows.forEach((row) => {
+          const pid = Number(row.dataset.produtoId);
+          const container = row.querySelector(".sortable-container");
+          if (!container) return;
+
+          const existing = [...container.querySelectorAll("img")].map((img) => img.src);
+          const room = maxUrls - existing.length;
+          if (room <= 0) return;
+
+          const toAdd = clipboardImages.filter((url) => !existing.includes(url)).slice(0, room);
+          toAdd.forEach((url) => container.appendChild(createImageWrapper(pid, url)));
+          reindexWrappers(container);
+        });
+
+        updateButtons();
+      }
+
+      copyImagesBtn.addEventListener("click", copySelectedImages);
+      pasteImagesBtn.addEventListener("click", pasteImagesToSelectedProducts);
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("select-image")) return;
+
+        const chk = e.target;
+        const wrap = chk.closest(".image-wrapper");
+        const col = wrap.dataset.imageIndex;
+        const colImages = [...document.querySelectorAll(`.image-wrapper[data-image-index="${col}"] .select-image`)];
+
+        if (e.shiftKey && lastImageSelect) {
+          const lastCol = lastImageSelect.closest(".image-wrapper").dataset.imageIndex;
+          if (lastCol !== col) return alert("Selecao por coluna funciona apenas na mesma coluna.");
+
+          const start = colImages.indexOf(lastImageSelect);
+          const end = colImages.indexOf(chk);
+          const [a, b] = [Math.min(start, end), Math.max(start, end)];
+
+          for (let i = a; i <= b; i++) {
+            colImages[i].checked = true;
+            colImages[i].closest(".image-wrapper").classList.add("selected-img-container");
+          }
+        } else if (!e.ctrlKey) {
+          document.querySelectorAll(".select-image").forEach((item) => {
+            item.checked = false;
+            item.closest(".image-wrapper").classList.remove("selected-img-container");
+          });
+
+          chk.checked = true;
+          wrap.classList.add("selected-img-container");
+        }
+
+        lastImageSelect = chk;
+        updateButtons();
+      });
+
+      function initImageRows() {
+        document.querySelectorAll("tr[data-produto-id]").forEach((row) => {
+          const produtoId = row.dataset.produtoId;
+          const allTds = [...row.querySelectorAll("td")];
+          const imageCells = allTds.slice(3, 18);
+
+          if (!imageCells.length) return;
+
+          const firstCell = imageCells[0];
+          if (firstCell.querySelector(".sortable-container")) {
+            return;
+          }
+
+          const wrappers = imageCells.map((td) => td.querySelector(".image-wrapper")).filter(Boolean);
+
+          const container = document.createElement("div");
+          container.classList.add("sortable-container");
+
+          wrappers.forEach((wrap) => container.appendChild(wrap));
+
+          imageCells.forEach((td, index) => {
+            td.innerHTML = "";
+            if (index === 0) {
+              td.colSpan = 15;
+              td.appendChild(container);
+            } else {
+              td.remove();
+            }
+          });
+
+          reindexWrappers(container);
+
+          new Sortable(container, {
+            animation: 150,
+            draggable: ".image-wrapper",
+            onEnd(evt) {
+              const all = [...container.querySelectorAll(".image-wrapper")];
+              const dragged = evt.item;
+
+              const selected = [...container.querySelectorAll(".select-image:checked")].map((ch) =>
+                ch.closest(".image-wrapper"),
+              );
+
+              let newList;
+              if (selected.includes(dragged) && selected.length > 1) {
+                const dropIndex = all.indexOf(dragged);
+                newList = all.filter((w) => !selected.includes(w));
+                newList.splice(dropIndex, 0, ...selected);
+              } else {
+                newList = [...all];
+              }
+
+              newList.forEach((w) => container.appendChild(w));
+              reindexWrappers(container);
+
+              const urls = newList.map((w) => w.querySelector("img").src);
+              fetch("/reordenar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ produto_id: produtoId, urls }),
+              });
+            },
+          });
+        });
+      }
+
+      function moverImagens() {
+        const origem = Number(moveOrigem.value);
+        const destino = Number(moveDestino.value);
+
+        if (!origem || !destino) return alert("IDs invalidos.");
+        if (origem === destino) return alert("IDs iguais.");
+
+        fetch("/mover_imagens", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ origem, destino }),
+        }).then(() => refreshCurrentPage());
+      }
+
+      document.getElementById("moveColumnBtn").addEventListener("click", () => {
+        const coluna = Number(document.getElementById("moveColumnSelect").value);
+        if (!coluna) return alert("Selecione a coluna destino.");
+
+        const selecionadas = {};
+        document.querySelectorAll(".select-image:checked").forEach((chk) => {
+          const wrap = chk.closest(".image-wrapper");
+          const produtoId = wrap.closest("tr").dataset.produtoId;
+          const url = wrap.querySelector("img").src;
+
+          if (!selecionadas[produtoId]) selecionadas[produtoId] = [];
+          selecionadas[produtoId].push(url);
+        });
+
+        if (!Object.keys(selecionadas).length) {
+          return alert("Nenhuma imagem selecionada.");
+        }
+
+        fetch("/mover_para_coluna", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ coluna, data: selecionadas }),
+        }).then(() => refreshCurrentPage());
+      });
+
+      let abaClicada = null;
+      const menu = document.getElementById("contextMenuAba");
+
+      document.querySelectorAll(".aba-item").forEach((aba) => {
+        aba.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          abaClicada = aba;
+          menu.style.left = e.pageX + "px";
+          menu.style.top = e.pageY + "px";
+          menu.style.display = "block";
+        });
+      });
+
+      document.addEventListener("click", () => (menu.style.display = "none"));
+
+      function renomearAba() {
+        const nome = prompt("Novo nome da aba:");
+        if (!nome) return;
+
+        fetch("/renomear_aba", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ aba_id: abaClicada.dataset.abaId, nome }),
+        }).then(() => refreshCurrentPage());
+      }
+
+      function excluirAba() {
+        if (!confirm("Excluir aba inteira e limpar seus dados?")) return;
+
+        fetch("/excluir_aba", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ aba_id: abaClicada.dataset.abaId }),
+        }).then(() => refreshCurrentPage());
+      }
+
+      function duplicarAba() {
+        fetch("/duplicar_aba", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ aba_id: abaClicada.dataset.abaId }),
+        }).then(() => refreshCurrentPage());
+      }
+
+      function moverAbaCima() {
+        fetch("/mover_aba_cima", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ aba_id: abaClicada.dataset.abaId }),
+        }).then(() => refreshCurrentPage());
+      }
+
+      function moverAbaBaixo() {
+        fetch("/mover_aba_baixo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ aba_id: abaClicada.dataset.abaId }),
+        }).then(() => refreshCurrentPage());
+      }
+
+      new Sortable(document.getElementById("abasContainer"), {
+        animation: 150,
+        draggable: ".aba-item",
+        onEnd() {
+          const ordem = [...document.querySelectorAll(".aba-item")].map((a) => a.dataset.abaId);
+          fetch("/reordenar_abas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ordem }),
+          });
+        },
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("select-product")) return;
+
+        const chk = e.target;
+        const row = chk.closest("tr");
+        const allProductChecks = [...document.querySelectorAll(".select-product")];
+
+        if (e.shiftKey && lastProductSelect) {
+          const allRows = allProductChecks.map((c) => c.closest("tr"));
+          const start = allRows.indexOf(lastProductSelect.closest("tr"));
+          const end = allRows.indexOf(row);
+          const [a, b] = [Math.min(start, end), Math.max(start, end)];
+
+          for (let i = a; i <= b; i++) {
+            const current = allProductChecks[i];
+            current.checked = true;
+            current.closest("tr").classList.add("selected-row");
+          }
+        } else if (!e.ctrlKey) {
+          allProductChecks.forEach((current) => {
+            current.checked = false;
+            current.closest("tr").classList.remove("selected-row");
+          });
+
+          chk.checked = true;
+          row.classList.add("selected-row");
+        }
+
+        lastProductSelect = chk;
+        updateButtons();
+      });
+
+      async function uploadArquivo(produtoId) {
+        const input = document.getElementById("fileUpload-" + produtoId);
+        const files = Array.from(input.files);
+
+        if (!files.length) {
+          alert("Selecione pelo menos um arquivo.");
+          return;
+        }
+
+        const container = getSortableContainer(produtoId);
+        if (!container) return;
+
+        let compressedMessages = [];
+
+        for (let i = 0; i < files.length; i++) {
+          const fd = new FormData();
+          fd.append("file", files[i]);
+
+          const resp = await fetch("/upload_imagem", {
+            method: "POST",
+            body: fd,
+          });
+
+          const data = await resp.json();
+          if (!resp.ok || !data.url) {
+            alert(data.error || "Erro no upload da imagem.");
+            continue;
+          }
+
+          const saveResp = await fetch("/adicionar_url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ produto_id: produtoId, url: data.url }),
+          });
+
+          if (!saveResp.ok) {
+            alert("Nao foi possivel salvar a imagem no produto.");
+            continue;
+          }
+
+          if (container.querySelectorAll(".image-wrapper").length < maxUrls) {
+            container.appendChild(createImageWrapper(produtoId, data.url));
+            reindexWrappers(container);
+          }
+
+          if (data.compressed) {
+            compressedMessages.push(`${files[i].name}: ${data.original_kb}KB -> ${data.final_kb}KB`);
+          }
+        }
+
+        input.value = "";
+        if (compressedMessages.length) {
+          alert("Imagens compactadas:\n" + compressedMessages.join("\n"));
+        }
+      }
+
+      function salvarNome(id) {
+        const nome = document.getElementById("input-nome-" + id).value.trim();
+        if (!nome) return alert("Nome nao pode ser vazio.");
+
+        fetch("/atualizar_nome", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ produto_id: id, nome }),
+        }).then((r) => {
+          if (!r.ok) return alert("Erro ao salvar nome.");
+        });
+      }
+
+      document.getElementById("selectAllProducts")?.addEventListener("change", (e) => {
+        const checked = e.target.checked;
+        document.querySelectorAll(".select-product").forEach((chk) => {
+          chk.checked = checked;
+          chk.closest("tr").classList.toggle("selected-row", checked);
+        });
+        updateButtons();
+      });
+
+      initImageRows();
+      updateButtons();
+    </script>
+  </body>
+</html>
+
+
+
+
